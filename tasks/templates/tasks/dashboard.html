@@ -1,0 +1,130 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}Dashboard - System Zarządzania Projektami{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <h1><i class="fas fa-chart-line me-2"></i>Dashboard</h1>
+    <p class="lead">Witaj, <strong>{{ user.username }}</strong>! Oto przegląd Twoich projektów.</p>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row">
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card primary">
+            <div class="stat-card-icon">
+                <i class="fas fa-project-diagram"></i>
+            </div>
+            <div class="stat-card-title">Wszystkie projekty</div>
+            <div class="stat-card-value">{{ total_projects }}</div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card success">
+            <div class="stat-card-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-card-title">Zakończone</div>
+            <div class="stat-card-value">{{ completed_projects }}</div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card warning">
+            <div class="stat-card-icon">
+                <i class="fas fa-spinner"></i>
+            </div>
+            <div class="stat-card-title">W trakcie</div>
+            <div class="stat-card-value">{{ in_progress_projects }}</div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card info">
+            <div class="stat-card-icon">
+                <i class="fas fa-tasks"></i>
+            </div>
+            <div class="stat-card-title">Moje zadania</div>
+            <div class="stat-card-value">{{ my_tasks }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Projects -->
+<div class="row mt-4">
+    <div class="col-12">
+        <h3 class="mb-3">
+            <i class="fas fa-clock me-2"></i>
+            Ostatnie projekty
+        </h3>
+        
+        {% if recent_projects %}
+            {% for project in recent_projects %}
+                <div class="project-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="project-title">
+                            <i class="fas fa-folder me-2" style="color: var(--primary-color);"></i>
+                            {{ project.name }}
+                        </div>
+                        <div>
+                            {% if project.status == 'completed' %}
+                                <span class="badge-custom badge-completed">
+                                    <i class="fas fa-check me-1"></i>Zakończony
+                                </span>
+                            {% elif project.status == 'in_progress' %}
+                                <span class="badge-custom badge-in-progress">
+                                    <i class="fas fa-hourglass-half me-1"></i>W trakcie
+                                </span>
+                            {% else %}
+                                <span class="badge-custom badge-started">
+                                    <i class="fas fa-play me-1"></i>Rozpoczęty
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <p class="project-description">
+                        {{ project.description|truncatewords:20|default:"Brak opisu" }}
+                    </p>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="project-meta">
+                            <span>
+                                <i class="fas fa-user me-1"></i>
+                                {{ project.coordinator.username }}
+                            </span>
+                            <span>
+                                <i class="fas fa-calendar me-1"></i>
+                                {{ project.start_date|date:"d.m.Y" }} - {{ project.end_date|date:"d.m.Y" }}
+                            </span>
+                        </div>
+                        <a href="{% url 'project_detail' project.id %}" class="btn btn-primary-custom btn-custom btn-sm">
+                            <i class="fas fa-arrow-right"></i>
+                            Zobacz
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-inbox"></i>
+                </div>
+                <h4>Brak projektów</h4>
+                <p>Nie masz jeszcze żadnych projektów do wyświetlenia.</p>
+            </div>
+        {% endif %}
+        
+        {% if recent_projects %}
+        <div class="mt-4 text-center">
+            <a href="{% url 'project_list' %}" class="btn btn-primary-custom btn-custom">
+                <i class="fas fa-list"></i>
+                Zobacz wszystkie projekty
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

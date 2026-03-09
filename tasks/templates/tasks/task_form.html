@@ -1,0 +1,137 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}{{ title }} - System Zarządzania Projektami{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <h1>
+        <i class="fas fa-tasks me-2"></i>
+        {{ title }}
+    </h1>
+    <p class="lead">
+        Projekt: <strong>{{ project.name }}</strong>
+    </p>
+</div>
+
+<!-- Form -->
+<div class="row">
+    <div class="col-lg-8">
+        <div class="project-card">
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- Basic Information Section -->
+                <h5 class="mb-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Informacje o zadaniu
+                </h5>
+                
+                <div class="mb-3">
+                    {{ form.title.label_tag }}
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <div class="text-danger">{{ form.title.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.description.label_tag }}
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <div class="text-danger">{{ form.description.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        {{ form.status.label_tag }}
+                        {{ form.status }}
+                        {% if form.status.errors %}
+                            <div class="text-danger">{{ form.status.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        {{ form.priority.label_tag }}
+                        {{ form.priority }}
+                        {% if form.priority.errors %}
+                            <div class="text-danger">{{ form.priority.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        {{ form.due_date.label_tag }}
+                        {{ form.due_date }}
+                        {% if form.due_date.errors %}
+                            <div class="text-danger">{{ form.due_date.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.cost.label_tag }}
+                    {{ form.cost }}
+                    {% if form.cost.errors %}
+                        <div class="text-danger">{{ form.cost.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <hr class="my-4">
+                
+                <!-- Assignment Section -->
+                <h5 class="mb-3">
+                    <i class="fas fa-users me-2"></i>
+                    Przypisanie
+                </h5>
+                
+                <div class="mb-3">
+                    {{ form.project.label_tag }}
+                    {{ form.project }}
+                    {% if form.project.errors %}
+                        <div class="text-danger">{{ form.project.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.assigned_to.label_tag }}
+                    <small class="text-muted">(Przytrzymaj Ctrl aby wybrać wiele osób)</small>
+                    {{ form.assigned_to }}
+                    {% if form.assigned_to.errors %}
+                        <div class="text-danger">{{ form.assigned_to.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <hr class="my-4">
+                
+                <!-- Buttons -->
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary-custom btn-custom">
+                        <i class="fas fa-save me-2"></i>
+                        Zapisz zadanie
+                    </button>
+                    <a href="{% url 'project_detail' project.pk %}" 
+                       class="btn btn-custom" 
+                       style="background: #6b7280; color: white;">
+                        <i class="fas fa-times me-2"></i>
+                        Anuluj
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Help Sidebar -->
+    <div class="col-lg-4">
+        <div class="project-card" style="background: #f9fafb;">
+            <h6><i class="fas fa-lightbulb me-2"></i>Wskazówki</h6>
+            <ul class="small text-muted mb-0" style="padding-left: 1.2rem;">
+                <li>Termin można wypełnić ręcznie lub użyć kalendarza</li>
+                <li>Koszt zadania jest dodawany do wykorzystanego budżetu projektu</li>
+                <li>Zadanie może być przypisane do wielu osób</li>
+                <li>Status zadania można zmienić w dowolnym momencie</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

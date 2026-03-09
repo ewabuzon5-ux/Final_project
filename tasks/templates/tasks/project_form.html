@@ -1,0 +1,171 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}{{ title }} - System Zarządzania Projektami{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <h1>
+        <i class="fas fa-folder-plus me-2"></i>
+        {{ title }}
+    </h1>
+    <p class="lead">Wypełnij poniższy formularz, aby {% if project %}edytować{% else %}utworzyć{% endif %} projekt</p>
+</div>
+
+<!-- Form -->
+<div class="row">
+    <div class="col-lg-8">
+        <div class="project-card">
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- Basic Information Section -->
+                <h5 class="mb-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Podstawowe informacje
+                </h5>
+                
+                <div class="mb-3">
+                    {{ form.name.label_tag }}
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                        <div class="text-danger">{{ form.name.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.description.label_tag }}
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <div class="text-danger">{{ form.description.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        {{ form.status.label_tag }}
+                        {{ form.status }}
+                        {% if form.status.errors %}
+                            <div class="text-danger">{{ form.status.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        {{ form.start_date.label_tag }}
+                        {{ form.start_date }}
+                        {% if form.start_date.errors %}
+                            <div class="text-danger">{{ form.start_date.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        {{ form.end_date.label_tag }}
+                        {{ form.end_date }}
+                        {% if form.end_date.errors %}
+                            <div class="text-danger">{{ form.end_date.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <!-- Team Section -->
+                <h5 class="mb-3">
+                    <i class="fas fa-users me-2"></i>
+                    Zespół
+                </h5>
+                
+                <div class="mb-3">
+                    {{ form.team_members.label_tag }}
+                    <small class="text-muted">(Przytrzymaj Ctrl aby wybrać wiele osób)</small>
+                    {{ form.team_members }}
+                    {% if form.team_members.errors %}
+                        <div class="text-danger">{{ form.team_members.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <hr class="my-4">
+                
+                <!-- Budget Section -->
+                <h5 class="mb-3">
+                    <i class="fas fa-wallet me-2"></i>
+                    Budżet i źródła finansowania
+                </h5>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form.total_budget.label_tag }}
+                        {{ form.total_budget }}
+                        {% if form.total_budget.errors %}
+                            <div class="text-danger">{{ form.total_budget.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        {{ form.grant_amount.label_tag }}
+                        {{ form.grant_amount }}
+                        {% if form.grant_amount.errors %}
+                            <div class="text-danger">{{ form.grant_amount.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form.own_contribution_financial.label_tag }}
+                        {{ form.own_contribution_financial }}
+                        {% if form.own_contribution_financial.errors %}
+                            <div class="text-danger">{{ form.own_contribution_financial.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        {{ form.own_contribution_non_financial.label_tag }}
+                        {{ form.own_contribution_non_financial }}
+                        {% if form.own_contribution_non_financial.errors %}
+                            <div class="text-danger">{{ form.own_contribution_non_financial.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.income_from_recipients.label_tag }}
+                    {{ form.income_from_recipients }}
+                    {% if form.income_from_recipients.errors %}
+                        <div class="text-danger">{{ form.income_from_recipients.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <hr class="my-4">
+                
+                <!-- Buttons -->
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary-custom btn-custom">
+                        <i class="fas fa-save me-2"></i>
+                        Zapisz projekt
+                    </button>
+                    <a href="{% if project %}{% url 'project_detail' project.pk %}{% else %}{% url 'project_list' %}{% endif %}" 
+                       class="btn btn-custom" 
+                       style="background: #6b7280; color: white;">
+                        <i class="fas fa-times me-2"></i>
+                        Anuluj
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Help Sidebar -->
+    <div class="col-lg-4">
+        <div class="project-card" style="background: #f9fafb;">
+            <h6><i class="fas fa-lightbulb me-2"></i>Wskazówki</h6>
+            <ul class="small text-muted mb-0" style="padding-left: 1.2rem;">
+                <li>Wszystkie pola z datami można wypełnić ręcznie lub użyć kalendarza</li>
+                <li>Suma źródeł finansowania powinna równać się budżetowi całkowitemu</li>
+                <li>Członków zespołu można dodać później</li>
+                <li>Status projektu można zmienić w dowolnym momencie</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

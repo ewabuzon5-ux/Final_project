@@ -1,0 +1,111 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}{{ title }} - System Zarządzania Projektami{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <h1>
+        <i class="fas fa-bullseye me-2"></i>
+        {{ title }}
+    </h1>
+    <p class="lead">
+        Projekt: <strong>{{ project.name }}</strong>
+    </p>
+</div>
+
+<!-- Form -->
+<div class="row">
+    <div class="col-lg-8">
+        <div class="project-card">
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- Result Information Section -->
+                <h5 class="mb-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Informacje o rezultacie
+                </h5>
+                
+                <div class="mb-3">
+                    {{ form.result_name.label_tag }}
+                    {{ form.result_name }}
+                    {% if form.result_name.errors %}
+                        <div class="text-danger">{{ form.result_name.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.target_value.label_tag }}
+                    {{ form.target_value }}
+                    {% if form.target_value.errors %}
+                        <div class="text-danger">{{ form.target_value.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.status.label_tag }}
+                    {{ form.status }}
+                    {% if form.status.errors %}
+                        <div class="text-danger">{{ form.status.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <hr class="my-4">
+                
+                <!-- Monitoring Section -->
+                <h5 class="mb-3">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Monitoring i ewaluacja
+                </h5>
+                
+                <div class="mb-3">
+                    {{ form.monitoring_method.label_tag }}
+                    {{ form.monitoring_method }}
+                    {% if form.monitoring_method.errors %}
+                        <div class="text-danger">{{ form.monitoring_method.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.information_source.label_tag }}
+                    {{ form.information_source }}
+                    {% if form.information_source.errors %}
+                        <div class="text-danger">{{ form.information_source.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <hr class="my-4">
+                
+                <!-- Buttons -->
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary-custom btn-custom">
+                        <i class="fas fa-save me-2"></i>
+                        Zapisz rezultat
+                    </button>
+                    <a href="{% url 'project_detail' project.pk %}" 
+                       class="btn btn-custom" 
+                       style="background: #6b7280; color: white;">
+                        <i class="fas fa-times me-2"></i>
+                        Anuluj
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Help Sidebar -->
+    <div class="col-lg-4">
+        <div class="project-card" style="background: #f9fafb;">
+            <h6><i class="fas fa-lightbulb me-2"></i>Wskazówki</h6>
+            <ul class="small text-muted mb-0" style="padding-left: 1.2rem;">
+                <li><strong>Rezultat</strong> to mierzalny efekt realizacji projektu</li>
+                <li>Wartość docelowa powinna być konkretna i weryfikowalna</li>
+                <li>Opisz precyzyjnie sposób monitorowania postępów</li>
+                <li>Wskaż źródła informacji, które potwierdzą osiągnięcie celu</li>
+                <li>Status możesz aktualizować w trakcie realizacji projektu</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

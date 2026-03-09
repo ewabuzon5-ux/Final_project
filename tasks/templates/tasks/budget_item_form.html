@@ -1,0 +1,177 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}{{ title }} - System Zarządzania Projektami{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <h1>
+        <i class="fas fa-wallet me-2"></i>
+        {{ title }}
+    </h1>
+    <p class="lead">
+        Projekt: <strong>{{ project.name }}</strong>
+    </p>
+</div>
+
+<!-- Form -->
+<div class="row">
+    <div class="col-lg-8">
+        <div class="project-card">
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- Category Section -->
+                <h5 class="mb-3">
+                    <i class="fas fa-tag me-2"></i>
+                    Kategoria i rodzaj kosztu
+                </h5>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form.category.label_tag }}
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                            <div class="text-danger">{{ form.category.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        {{ form.cost_type.label_tag }}
+                        {{ form.cost_type }}
+                        {% if form.cost_type.errors %}
+                            <div class="text-danger">{{ form.cost_type.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <!-- Unit and Cost Section -->
+                <h5 class="mb-3">
+                    <i class="fas fa-calculator me-2"></i>
+                    Jednostki i koszt
+                </h5>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        {{ form.unit_type.label_tag }}
+                        {{ form.unit_type }}
+                        {% if form.unit_type.errors %}
+                            <div class="text-danger">{{ form.unit_type.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        {{ form.unit_cost.label_tag }}
+                        {{ form.unit_cost }}
+                        {% if form.unit_cost.errors %}
+                            <div class="text-danger">{{ form.unit_cost.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        {{ form.quantity.label_tag }}
+                        {{ form.quantity }}
+                        {% if form.quantity.errors %}
+                            <div class="text-danger">{{ form.quantity.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Wartość całkowita:</strong> Koszt jednostkowy × Liczba jednostek = 
+                    <span id="total-value">0.00</span> PLN
+                </div>
+                
+                <hr class="my-4">
+                
+                <!-- Multi-year Section -->
+                <h5 class="mb-3">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    Podział na lata
+                </h5>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        {{ form.year_1_amount.label_tag }}
+                        {{ form.year_1_amount }}
+                        {% if form.year_1_amount.errors %}
+                            <div class="text-danger">{{ form.year_1_amount.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        {{ form.year_2_amount.label_tag }}
+                        {{ form.year_2_amount }}
+                        {% if form.year_2_amount.errors %}
+                            <div class="text-danger">{{ form.year_2_amount.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        {{ form.year_3_amount.label_tag }}
+                        {{ form.year_3_amount }}
+                        {% if form.year_3_amount.errors %}
+                            <div class="text-danger">{{ form.year_3_amount.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <!-- Buttons -->
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary-custom btn-custom">
+                        <i class="fas fa-save me-2"></i>
+                        Zapisz pozycję budżetową
+                    </button>
+                    <a href="{% url 'project_detail' project.pk %}" 
+                       class="btn btn-custom" 
+                       style="background: #6b7280; color: white;">
+                        <i class="fas fa-times me-2"></i>
+                        Anuluj
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Help Sidebar -->
+    <div class="col-lg-4">
+        <div class="project-card" style="background: #f9fafb;">
+            <h6><i class="fas fa-lightbulb me-2"></i>Wskazówki</h6>
+            <ul class="small text-muted mb-0" style="padding-left: 1.2rem;">
+                <li><strong>Kategoria I:</strong> Koszty realizacji działań</li>
+                <li><strong>Kategoria II:</strong> Koszty administracyjne</li>
+                <li>Wartość całkowita liczy się automatycznie przy zapisie</li>
+                <li>Podział na lata pomaga w planowaniu budżetu wieloletniego</li>
+                <li>Suma wartości z lat może być mniejsza niż wartość całkowita (rezerwa)</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+// Calculate total value on the fly
+document.addEventListener('DOMContentLoaded', function() {
+    const unitCost = document.querySelector('input[name="unit_cost"]');
+    const quantity = document.querySelector('input[name="quantity"]');
+    const totalValue = document.getElementById('total-value');
+    
+    function calculateTotal() {
+        const cost = parseFloat(unitCost.value) || 0;
+        const qty = parseFloat(quantity.value) || 0;
+        const total = cost * qty;
+        totalValue.textContent = total.toFixed(2);
+    }
+    
+    unitCost.addEventListener('input', calculateTotal);
+    quantity.addEventListener('input', calculateTotal);
+    
+    // Calculate on page load if editing
+    calculateTotal();
+});
+</script>
+{% endblock %}

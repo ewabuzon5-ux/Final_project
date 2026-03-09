@@ -1,0 +1,500 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}{{ project.name }} - System Zarządzania Projektami{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h1>
+                <i class="fas fa-folder me-2"></i>
+                {{ project.name }}
+            </h1>
+            <p class="lead">{{ project.description|default:"Brak opisu" }}</p>
+        </div>
+        <div>
+            {% if project.status == 'completed' %}
+                <span class="badge-custom badge-completed">
+                    <i class="fas fa-check me-1"></i>Zakończony
+                </span>
+            {% elif project.status == 'in_progress' %}
+                <span class="badge-custom badge-in-progress">
+                    <i class="fas fa-hourglass-half me-1"></i>W trakcie
+                </span>
+            {% else %}
+                <span class="badge-custom badge-started">
+                    <i class="fas fa-play me-1"></i>Rozpoczęty
+                </span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Navigation Tabs -->
+<ul class="nav nav-tabs mb-4" id="projectTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button">
+            <i class="fas fa-info-circle me-1"></i>Informacje
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tasks-tab" data-bs-toggle="tab" data-bs-target="#tasks" type="button">
+            <i class="fas fa-tasks me-1"></i>Zadania
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="budget-tab" data-bs-toggle="tab" data-bs-target="#budget" type="button">
+            <i class="fas fa-wallet me-1"></i>Budżet
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="results-tab" data-bs-toggle="tab" data-bs-target="#results" type="button">
+            <i class="fas fa-bullseye me-1"></i>Rezultaty
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="team-tab" data-bs-toggle="tab" data-bs-target="#team" type="button">
+            <i class="fas fa-users me-1"></i>Zespół
+        </button>
+    </li>
+</ul>
+
+<!-- Tab Content -->
+<div class="tab-content" id="projectTabsContent">
+    <!-- Info Tab -->
+    <div class="tab-pane fade show active" id="info" role="tabpanel">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="project-card">
+                    <h5><i class="fas fa-calendar-alt me-2"></i>Terminy</h5>
+                    <p><strong>Data rozpoczęcia:</strong> {{ project.start_date|date:"d.m.Y" }}</p>
+                    <p><strong>Data zakończenia:</strong> {{ project.end_date|date:"d.m.Y" }}</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="project-card">
+                    <h5><i class="fas fa-user-tie me-2"></i>Koordynator</h5>
+                    <p><i class="fas fa-user me-1"></i> {{ project.coordinator.username }}</p>
+                    <p><i class="fas fa-envelope me-1"></i> {{ project.coordinator.email|default:"Brak email" }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="project-card">
+                    <h5><i class="fas fa-chart-line me-2"></i>Postęp realizacji</h5>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Ukończone zadania</span>
+                            <strong>{{ project.get_completion_percentage|floatformat:0 }}%</strong>
+                        </div>
+                        <div class="progress" style="height: 20px; border-radius: 10px;">
+                            <div class="progress-bar" role="progressbar" 
+                                 style="width: {{ project.get_completion_percentage }}%; background: linear-gradient(90deg, #10b981, #059669);"
+                                 aria-valuenow="{{ project.get_completion_percentage }}">
+                                {{ project.get_completion_percentage|floatformat:0 }}%
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Wykorzystanie budżetu</span>
+                            <strong>{{ project.get_budget_percentage|floatformat:0 }}%</strong>
+                        </div>
+                        <div class="progress" style="height: 20px; border-radius: 10px;">
+                            <div class="progress-bar" role="progressbar" 
+                                 style="width: {{ project.get_budget_percentage }}%; 
+                                        background: {% if project.get_budget_percentage > 90 %}linear-gradient(90deg, #ef4444, #dc2626){% else %}linear-gradient(90deg, #3b82f6, #2563eb){% endif %};"
+                                 aria-valuenow="{{ project.get_budget_percentage }}">
+                                {{ project.get_budget_percentage|floatformat:0 }}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tasks Tab -->
+    <div class="tab-pane fade" id="tasks" role="tabpanel">
+        <div class="project-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5><i class="fas fa-tasks me-2"></i>Lista zadań</h5>
+                {% if user == project.coordinator or user in project.team_members.all %}
+                    <a href="{% url 'task_create' project.pk %}" class="btn btn-primary-custom btn-custom btn-sm">
+                        <i class="fas fa-plus me-2"></i>
+                        Dodaj zadanie
+                    </a>
+                {% endif %}
+            </div>
+            
+            {% if project.tasks.all %}
+                <div class="list-group">
+                    {% for task in project.tasks.all %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6>{{ task.title }}</h6>
+                                    <p class="mb-1 text-muted">{{ task.description|truncatewords:20|default:"Brak opisu" }}</p>
+                                    <small class="d-block mb-2">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        Termin: {{ task.due_date|date:"d.m.Y"|default:"Nie określono" }}
+                                        <span class="ms-3">
+                                            <i class="fas fa-wallet me-1"></i>
+                                            Koszt: {{ task.cost|floatformat:2 }} PLN
+                                        </span>
+                                    </small>
+                                    {% if task.assigned_to.all %}
+                                        <small>
+                                            <i class="fas fa-user me-1"></i>
+                                            {% for person in task.assigned_to.all %}
+                                                {{ person.username }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </small>
+                                    {% endif %}
+                                </div>
+                                <div class="d-flex flex-column align-items-end gap-2">
+                                    <div>
+                                        {% if task.status == 'completed' %}
+                                            <span class="badge-custom badge-completed">Ukończone</span>
+                                        {% elif task.status == 'in_progress' %}
+                                            <span class="badge-custom badge-in-progress">W trakcie</span>
+                                        {% else %}
+                                            <span class="badge-custom badge-started">Do zrobienia</span>
+                                        {% endif %}
+                                        
+                                        {% if task.priority == 'high' %}
+                                            <span class="badge-custom" style="background: #ef4444; color: white;">
+                                                <i class="fas fa-exclamation-circle"></i> Wysoki
+                                            </span>
+                                        {% elif task.priority == 'medium' %}
+                                            <span class="badge-custom badge-in-progress">
+                                                <i class="fas fa-minus-circle"></i> Średni
+                                            </span>
+                                        {% else %}
+                                            <span class="badge-custom" style="background: #6b7280; color: white;">
+                                                <i class="fas fa-arrow-down"></i> Niski
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="d-flex gap-1">
+                                        {% if user in task.assigned_to.all or user == project.coordinator %}
+                                            <a href="{% url 'task_edit' task.pk %}" class="btn btn-sm btn-custom" style="background: #f59e0b; color: white;">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        {% endif %}
+                                        {% if user == project.coordinator %}
+                                            <a href="{% url 'task_delete' task.pk %}" class="btn btn-sm btn-custom" style="background: #ef4444; color: white;">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">Brak zadań w tym projekcie</p>
+                {% if user == project.coordinator or user in project.team_members.all %}
+                    <a href="{% url 'task_create' project.pk %}" class="btn btn-primary-custom btn-custom mt-3">
+                        <i class="fas fa-plus me-2"></i>
+                        Dodaj pierwsze zadanie
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Budget Tab -->
+    <div class="tab-pane fade" id="budget" role="tabpanel">
+        <div class="project-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5><i class="fas fa-wallet me-2"></i>Źródła finansowania</h5>
+            </div>
+            
+            <table class="table">
+                <tr>
+                    <td><strong>Budżet całkowity:</strong></td>
+                    <td class="text-end"><strong>{{ project.total_budget|floatformat:2 }} PLN</strong></td>
+                </tr>
+                <tr>
+                    <td>Dotacja:</td>
+                    <td class="text-end">{{ project.grant_amount|floatformat:2 }} PLN</td>
+                </tr>
+                <tr>
+                    <td>Wkład własny (finansowy):</td>
+                    <td class="text-end">{{ project.own_contribution_financial|floatformat:2 }} PLN</td>
+                </tr>
+                <tr>
+                    <td>Wkład własny (niefinansowy):</td>
+                    <td class="text-end">{{ project.own_contribution_non_financial|floatformat:2 }} PLN</td>
+                </tr>
+                <tr>
+                    <td>Przychody od odbiorców:</td>
+                    <td class="text-end">{{ project.income_from_recipients|floatformat:2 }} PLN</td>
+                </tr>
+            </table>
+        </div>
+        
+        <!-- Detailed Budget Items -->
+        <div class="project-card mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5><i class="fas fa-list me-2"></i>Szczegółowa kalkulacja kosztów</h5>
+                {% if user == project.coordinator %}
+                    <a href="{% url 'budget_item_create' project.pk %}" class="btn btn-primary-custom btn-custom btn-sm">
+                        <i class="fas fa-plus me-2"></i>
+                        Dodaj pozycję
+                    </a>
+                {% endif %}
+            </div>
+            
+            {% if project.budget_items.all %}
+                <!-- Implementation Costs -->
+                <h6 class="mt-4 mb-3">
+                    <i class="fas fa-cogs me-2"></i>
+                    I. Koszty realizacji działań
+                </h6>
+                {% with implementation_items=project.budget_items.all|dictsort:"category" %}
+                    {% for item in implementation_items %}
+                        {% if item.category == 'implementation' %}
+                            <div class="project-card mb-2" style="background: #f9fafb;">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6>{{ item.cost_type }}</h6>
+                                        <div class="row small text-muted">
+                                            <div class="col-md-3">
+                                                <i class="fas fa-ruler me-1"></i>
+                                                Jednostka: {{ item.unit_type }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                <i class="fas fa-dollar-sign me-1"></i>
+                                                Koszt jedn.: {{ item.unit_cost|floatformat:2 }} PLN
+                                            </div>
+                                            <div class="col-md-3">
+                                                <i class="fas fa-hashtag me-1"></i>
+                                                Liczba: {{ item.quantity|floatformat:2 }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                <i class="fas fa-calculator me-1"></i>
+                                                Wartość: <strong>{{ item.total_value|floatformat:2 }} PLN</strong>
+                                            </div>
+                                        </div>
+                                        <div class="row small text-muted mt-2">
+                                            <div class="col-md-4">Rok 1: {{ item.year_1_amount|floatformat:2 }} PLN</div>
+                                            <div class="col-md-4">Rok 2: {{ item.year_2_amount|floatformat:2 }} PLN</div>
+                                            <div class="col-md-4">Rok 3: {{ item.year_3_amount|floatformat:2 }} PLN</div>
+                                        </div>
+                                    </div>
+                                    {% if user == project.coordinator %}
+                                        <div class="d-flex gap-1">
+                                            <a href="{% url 'budget_item_edit' item.pk %}" class="btn btn-sm btn-custom" style="background: #f59e0b; color: white;">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'budget_item_delete' item.pk %}" class="btn btn-sm btn-custom" style="background: #ef4444; color: white;">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endwith %}
+                
+                <!-- Administrative Costs -->
+                <h6 class="mt-4 mb-3">
+                    <i class="fas fa-briefcase me-2"></i>
+                    II. Koszty administracyjne
+                </h6>
+                {% with administrative_items=project.budget_items.all|dictsort:"category" %}
+                    {% for item in administrative_items %}
+                        {% if item.category == 'administrative' %}
+                            <div class="project-card mb-2" style="background: #f9fafb;">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6>{{ item.cost_type }}</h6>
+                                        <div class="row small text-muted">
+                                            <div class="col-md-3">
+                                                <i class="fas fa-ruler me-1"></i>
+                                                Jednostka: {{ item.unit_type }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                <i class="fas fa-dollar-sign me-1"></i>
+                                                Koszt jedn.: {{ item.unit_cost|floatformat:2 }} PLN
+                                            </div>
+                                            <div class="col-md-3">
+                                                <i class="fas fa-hashtag me-1"></i>
+                                                Liczba: {{ item.quantity|floatformat:2 }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                <i class="fas fa-calculator me-1"></i>
+                                                Wartość: <strong>{{ item.total_value|floatformat:2 }} PLN</strong>
+                                            </div>
+                                        </div>
+                                        <div class="row small text-muted mt-2">
+                                            <div class="col-md-4">Rok 1: {{ item.year_1_amount|floatformat:2 }} PLN</div>
+                                            <div class="col-md-4">Rok 2: {{ item.year_2_amount|floatformat:2 }} PLN</div>
+                                            <div class="col-md-4">Rok 3: {{ item.year_3_amount|floatformat:2 }} PLN</div>
+                                        </div>
+                                    </div>
+                                    {% if user == project.coordinator %}
+                                        <div class="d-flex gap-1">
+                                            <a href="{% url 'budget_item_edit' item.pk %}" class="btn btn-sm btn-custom" style="background: #f59e0b; color: white;">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'budget_item_delete' item.pk %}" class="btn btn-sm btn-custom" style="background: #ef4444; color: white;">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endwith %}
+                
+                <!-- Total Summary -->
+                <div class="project-card mt-4" style="background: #e0f2fe; border: 2px solid #0284c7;">
+                    <h6><i class="fas fa-calculator me-2"></i>Suma wszystkich kosztów</h6>
+                    <h4 class="mb-0">{{ project.get_total_spent|floatformat:2 }} PLN</h4>
+                </div>
+                
+            {% else %}
+                <p class="text-muted">Brak szczegółowych pozycji budżetowych</p>
+                {% if user == project.coordinator %}
+                    <a href="{% url 'budget_item_create' project.pk %}" class="btn btn-primary-custom btn-custom mt-3">
+                        <i class="fas fa-plus me-2"></i>
+                        Dodaj pierwszą pozycję budżetową
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Results Tab -->
+    <div class="tab-pane fade" id="results" role="tabpanel">
+        <div class="project-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5><i class="fas fa-bullseye me-2"></i>Rezultaty projektu</h5>
+                {% if user == project.coordinator %}
+                    <a href="{% url 'result_create' project.pk %}" class="btn btn-primary-custom btn-custom btn-sm">
+                        <i class="fas fa-plus me-2"></i>
+                        Dodaj rezultat
+                    </a>
+                {% endif %}
+            </div>
+            
+            {% if project.results.all %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nazwa rezultatu</th>
+                                <th>Wartość docelowa</th>
+                                <th>Sposób monitorowania</th>
+                                <th>Źródło informacji</th>
+                                <th>Status</th>
+                                {% if user == project.coordinator %}
+                                    <th>Akcje</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in project.results.all %}
+                                <tr>
+                                    <td><strong>{{ result.result_name }}</strong></td>
+                                    <td>{{ result.target_value }}</td>
+                                    <td>{{ result.monitoring_method|truncatewords:10 }}</td>
+                                    <td>{{ result.information_source }}</td>
+                                    <td>
+                                        {% if result.status == 'achieved' %}
+                                            <span class="badge-custom badge-completed">
+                                                <i class="fas fa-check-circle me-1"></i>Osiągnięty
+                                            </span>
+                                        {% elif result.status == 'in_progress' %}
+                                            <span class="badge-custom badge-in-progress">
+                                                <i class="fas fa-spinner me-1"></i>W trakcie
+                                            </span>
+                                        {% else %}
+                                            <span class="badge-custom badge-started">
+                                                <i class="fas fa-pause-circle me-1"></i>Nie rozpoczęty
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    {% if user == project.coordinator %}
+                                        <td>
+                                            <div class="d-flex gap-1">
+                                                <a href="{% url 'result_edit' result.pk %}" class="btn btn-sm btn-custom" style="background: #f59e0b; color: white;">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'result_delete' result.pk %}" class="btn btn-sm btn-custom" style="background: #ef4444; color: white;">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">Brak zdefiniowanych rezultatów dla tego projektu</p>
+                {% if user == project.coordinator %}
+                    <a href="{% url 'result_create' project.pk %}" class="btn btn-primary-custom btn-custom mt-3">
+                        <i class="fas fa-plus me-2"></i>
+                        Dodaj pierwszy rezultat
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Team Tab -->
+    <div class="tab-pane fade" id="team" role="tabpanel">
+        <div class="project-card">
+            <h5><i class="fas fa-users me-2"></i>Członkowie zespołu</h5>
+            {% if project.team_members.all %}
+                <div class="list-group">
+                    {% for member in project.team_members.all %}
+                        <div class="list-group-item">
+                            <i class="fas fa-user-circle me-2"></i>
+                            {{ member.username }}
+                            {% if member.profile.role == 'coordinator' %}
+                                <span class="badge-custom badge-coordinator ms-2">Koordynator</span>
+                            {% else %}
+                                <span class="badge-custom badge-executor ms-2">Wykonawca</span>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">Brak członków zespołu</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Action buttons -->
+<div class="mt-4 d-flex gap-2">
+    {% if user == project.coordinator %}
+        <a href="{% url 'project_edit' project.pk %}" class="btn btn-custom" style="background: #f59e0b; color: white;">
+            <i class="fas fa-edit me-2"></i>
+            Edytuj projekt
+        </a>
+        <a href="{% url 'project_delete' project.pk %}" class="btn btn-custom" style="background: #ef4444; color: white;">
+            <i class="fas fa-trash me-2"></i>
+            Usuń projekt
+        </a>
+    {% endif %}
+    <a href="{% url 'project_list' %}" class="btn btn-primary-custom btn-custom">
+        <i class="fas fa-arrow-left me-2"></i>
+        Powrót do listy projektów
+    </a>
+</div>
+{% endblock %}
