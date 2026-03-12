@@ -444,6 +444,99 @@ def register(request):
     
     return render(request, 'tasks/register.html', context)
 
+# ========== EMAIL NOTIFICATIONS ==========
+from django.core.mail import send_mail
+from django.conf import settings
+from datetime import timedelta
+from django.utils import timezone
+
+def send_deadline_reminder(task):
+    """
+    Send email reminder about upcoming task deadline
+    """
+    subject = f'Przypomnienie: Zbliża się termin zadania "{task.title}"'
+    
+    # Calculate days until deadline
+    days_until = (task.due_date - timezone.now().date()).days
+    
+    message = f"""
+Cześć!
+
+To przypomnienie o zbliżającym się terminie zadania:
+
+Zadanie: {task.title}
+Projekt: {task.project.name}
+Termin: {task.due_date.strftime('%d.%m.%Y')}
+Pozostało dni: {days_until}
+Priorytet: {task.get_priority_display()}
+Status: {task.get_status_display()}
+
+Opis zadania:
+{task.description}
+
+Link do projektu: http://localhost:8000/projects/{task.project.id}/
+
+Powodzenia!
+System Zarządzania Projektami
+    """
+    
+    # Send to all assigned users
+    recipient_list = [user.email for user in task.assigned_to.all() if user.email]
+    
+    if recipient_list:
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            recipient_list,
+            fail_silently=False,
+        )
+        return True
+    return False
+
+
+def send_new_task_notification(task):
+    """
+    Send email notification to coordinator about new task
+    """
+    subject = f'Nowe zadanie utworzone w projekcie "{task.project.name}"'
+    
+    message = f"""
+Cześć {task.project.coordinator.username}!
+
+Utworzono nowe zadanie w Twoim projekcie:
+
+Projekt: {task.project.name}
+Zadanie: {task.title}
+Priorytet: {task.get_priority_display()}
+Termin: {task.due_date.strftime('%d.%m.%Y') if task.due_date else 'Nie określono'}
+Utworzone przez: {task.created_by.username if task.created_by else 'System'}
+
+Przypisane osoby:
+{', '.join([user.username for user in task.assigned_to.all()]) if task.assigned_to.exists() else 'Brak'}
+
+Opis:
+{task.description}
+
+Link do projektu: http://localhost:8000/projects/{task.project.id}/
+
+System Zarządzania Projektami
+    """
+    
+    coordinator_email = task.project.coordinator.email
+    
+    if coordinator_email:
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [coordinator_email],
+            fail_silently=False,
+        )
+        return True
+    return False
+
+
 # ========== REST API VIEWS ==========
 from rest_framework import viewsets, permissions
 from .serializers import ProjectSerializer, TaskSerializer, BudgetItemSerializer, ResultSerializer
