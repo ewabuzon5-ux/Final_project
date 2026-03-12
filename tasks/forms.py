@@ -240,3 +240,63 @@ class ResultForm(forms.ModelForm):
             'information_source': 'Źródło informacji o osiągnięciu wskaźnika',
             'status': 'Status realizacji',
         }
+
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+
+# Registration form with role selection
+class UserRegistrationForm(UserCreationForm):
+    ROLE_CHOICES = [
+        ('coordinator', 'Koordynator projektu'),
+        ('executor', 'Wykonawca'),
+    ]
+    
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'})
+    )
+    
+    role = forms.ChoiceField(
+        choices=ROLE_CHOICES,
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label='Wybierz rolę'
+    )
+    
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password1', 'password2', 'role']
+        
+        widgets = {
+            'username': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nazwa użytkownika'
+            }),
+        }
+        
+        labels = {
+            'username': 'Nazwa użytkownika',
+            'email': 'Adres email',
+            'password1': 'Hasło',
+            'password2': 'Potwierdź hasło',
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Add Bootstrap classes to password fields
+        self.fields['password1'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Hasło'
+        })
+        self.fields['password2'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Potwierdź hasło'
+        })
+        
+        # Polish labels for password fields
+        self.fields['password1'].label = 'Hasło'
+        self.fields['password2'].label = 'Potwierdź hasło'
+        
+        # Polish help texts
+        self.fields['password1'].help_text = 'Hasło musi zawierać minimum 8 znaków i nie może być zbyt proste.'
+        self.fields['password2'].help_text = 'Wprowadź to samo hasło ponownie.'

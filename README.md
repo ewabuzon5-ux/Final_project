@@ -1,8 +1,8 @@
-# 📊 System Zarządzania Projektami
+System Zarządzania Projektami
 
 Webowa aplikacja do zarządzania projektami, zadaniami i budżetem, stworzona z wykorzystaniem Django. System wspiera koordynację projektów finansowanych z dotacji/grantów z pełnym monitoringiem budżetu wieloletniego i zespołem projektowym.
 
-## 🎯 Cel projektu
+Cel projektu
 
 Aplikacja umożliwia kompleksowe zarządzanie projektami z funkcjami:
 - Koordynacji wieloosobowych zespołów projektowych
@@ -10,23 +10,23 @@ Aplikacja umożliwia kompleksowe zarządzanie projektami z funkcjami:
 - Zarządzania budżetem wieloletnim ze szczegółową kalkulacją kosztów
 - Monitorowania rezultatów i celów projektu
 
-## ✨ Funkcjonalności
+Funkcjonalności
 
-### 📁 Zarządzanie projektami
+Zarządzanie projektami
 - Tworzenie, edycja i usuwanie projektów
 - Statusy: Rozpoczęty / W trakcie / Zakończony
 - Określanie terminów realizacji (data rozpoczęcia i zakończenia)
 - Przypisywanie koordynatora i członków zespołu
 - Automatyczne liczenie postępu realizacji
 
-### ✅ Zarządzanie zadaniami
+Zarządzanie zadaniami
 - Pełny CRUD zadań w ramach projektów
 - Przypisywanie zadań do wielu osób
 - Priorytety (niski, średni, wysoki) i statusy
 - Terminy wykonania (deadlines)
 - Śledzenie kosztów zadań
 
-### 💰 Zarządzanie budżetem
+Zarządzanie budżetem
 - **Źródła finansowania:**
   - Dotacja
   - Wkład własny finansowy
@@ -38,13 +38,13 @@ Aplikacja umożliwia kompleksowe zarządzanie projektami z funkcjami:
   - Podział na lata (wieloletnie planowanie budżetu)
   - Automatyczne liczenie wartości całkowitej i sum
 
-### 🎯 Rezultaty projektu
+Rezultaty projektu
 - Definiowanie celów i rezultatów projektu
 - Wartości docelowe (planowany poziom osiągnięcia)
 - Sposób monitorowania i źródła informacji
 - Statusy: Nie rozpoczęty / W trakcie / Osiągnięty
 
-### 👥 System ról i uprawnień
+System ról i uprawnień
 - **Koordynator:**
   - Pełna kontrola nad swoimi projektami
   - Tworzenie i edycja projektów, zadań, budżetu
@@ -54,17 +54,17 @@ Aplikacja umożliwia kompleksowe zarządzanie projektami z funkcjami:
   - Edycja własnych zadań
   - Przeglądanie budżetu (tylko odczyt)
 
-### 📊 Dashboard
+Dashboard
 - Statystyki: wszystkie projekty, zakończone, w trakcie
 - Liczba przypisanych zadań
 - Ostatnie projekty użytkownika
 - Paski postępu realizacji zadań i wykorzystania budżetu
 
-## 🔌 REST API
+REST API
 
 Aplikacja udostępnia RESTful API dla wszystkich głównych modeli danych.
 
-### Dostępne endpointy:
+Dostępne endpointy:
 
 - **`GET /api/`** - Lista wszystkich dostępnych endpointów
 - **`GET/POST /api/projects/`** - Lista projektów / Tworzenie nowego projektu
@@ -76,17 +76,17 @@ Aplikacja udostępnia RESTful API dla wszystkich głównych modeli danych.
 - **`GET/POST /api/results/`** - Lista rezultatów
 - **`GET/PUT/PATCH/DELETE /api/results/{id}/`** - Szczegóły/edycja/usuwanie rezultatu
 
-### Autentykacja:
+Autentykacja:
 
 API wymaga uwierzytelnienia. Użyj sesji Django lub tokenu uwierzytelniającego.
 
-### Uprawnienia:
+Uprawnienia:
 
 - **Koordynatorzy:** Pełen dostęp do swoich projektów (CRUD)
 - **Wykonawcy:** Odczyt projektów, edycja przypisanych zadań
 - Użytkownicy widzą tylko dane z projektów, do których mają dostęp
 
-## 🛠️ Technologie
+Technologie
 
 - **Backend:** Python 3.13, Django 6.0
 - **Frontend:** HTML5, CSS3, Bootstrap 5, Font Awesome
@@ -95,7 +95,7 @@ API wymaga uwierzytelnienia. Użyj sesji Django lub tokenu uwierzytelniającego.
 - **Autentykacja:** Django Authentication System
 - **Narzędzia:** Git, VS Code
 
-## 📋 Modele danych
+Modele danych
 
 - **User / UserProfile** - użytkownicy z rolami (koordynator/wykonawca)
 - **Project** - projekty z budżetem, terminami, zespołem
@@ -103,13 +103,13 @@ API wymaga uwierzytelnienia. Użyj sesji Django lub tokenu uwierzytelniającego.
 - **BudgetItem** - szczegółowe pozycje budżetowe z podziałem na lata
 - **Result** - rezultaty/cele projektów z monitoringiem
 
-## 🚀 Instalacja i uruchomienie
+Instalacja i uruchomienie
 
-### Wymagania
+Wymagania
 - Python 3.8+
 - pip
 
-### Kroki instalacji
+Kroki instalacji
 
 1. **Sklonuj repozytorium:**
 ```bash

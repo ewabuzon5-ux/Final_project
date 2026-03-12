@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Project, Task, BudgetItem, Result
-from .forms import ProjectForm, TaskForm, BudgetItemForm, ResultForm
+from .models import Project, Task, BudgetItem, Result, UserProfile
+from .forms import ProjectForm, TaskForm, BudgetItemForm, ResultForm, UserRegistrationForm
 from rest_framework import viewsets, permissions
 from .serializers import ProjectSerializer, TaskSerializer, BudgetItemSerializer, ResultSerializer
 
@@ -415,6 +415,35 @@ def result_delete(request, pk):
     }
     
     return render(request, 'tasks/result_confirm_delete.html', context)
+# User registration view
+def register(request):
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            # Create user but don't save yet
+            user = form.save(commit=False)
+            user.email = form.cleaned_data['email']
+            user.save()
+            
+            # Create UserProfile with selected role
+            role = form.cleaned_data['role']
+            UserProfile.objects.create(user=user, role=role)
+            
+            # Log the user in
+            from django.contrib.auth import login
+            login(request, user)
+            
+            messages.success(request, f'Witaj {user.username}! Twoje konto zostało utworzone.')
+            return redirect('dashboard')
+    else:
+        form = UserRegistrationForm()
+    
+    context = {
+        'form': form,
+    }
+    
+    return render(request, 'tasks/register.html', context)
+
 # ========== REST API VIEWS ==========
 from rest_framework import viewsets, permissions
 from .serializers import ProjectSerializer, TaskSerializer, BudgetItemSerializer, ResultSerializer

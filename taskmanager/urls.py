@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views, logout as auth_logout
 from django.shortcuts import redirect
+from tasks import views as task_views
 
 def logout_view(request):
     auth_logout(request)
@@ -11,7 +12,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('tasks.urls')),
     
-    # Login/Logout URLs
+    # Authentication URLs
     path('login/', auth_views.LoginView.as_view(template_name='tasks/login.html'), name='login'),
     path('logout/', logout_view, name='logout'),
+    path('register/', task_views.register, name='register'),  # <-- NOWE!
 ]
