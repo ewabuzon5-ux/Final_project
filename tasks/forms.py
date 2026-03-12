@@ -79,6 +79,34 @@ class ProjectForm(forms.ModelForm):
             'own_contribution_non_financial': 'Wkład własny niefinansowy (PLN)',
             'income_from_recipients': 'Przychody od odbiorców (PLN)',
         }
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get('start_date')
+        end_date = cleaned_data.get('end_date')
+        total_budget = cleaned_data.get('total_budget')
+        grant_amount = cleaned_data.get('grant_amount')
+        own_financial = cleaned_data.get('own_contribution_financial')
+        own_non_financial = cleaned_data.get('own_contribution_non_financial')
+        income = cleaned_data.get('income_from_recipients')
+        
+        # Validate that end_date is after start_date
+        if start_date and end_date:
+            if end_date < start_date:
+                raise forms.ValidationError(
+                    'Data zakończenia projektu nie może być wcześniejsza niż data rozpoczęcia.'
+                )
+        
+        # Validate that sum of funding sources equals total budget
+        if all([total_budget, grant_amount, own_financial, own_non_financial, income]):
+            sources_sum = grant_amount + own_financial + own_non_financial + income
+            # Allow small floating point differences (0.01 PLN)
+            if abs(sources_sum - total_budget) > 0.01:
+                raise forms.ValidationError(
+                    f'Suma źródeł finansowania ({sources_sum:.2f} PLN) musi być równa budżetowi całkowitemu ({total_budget:.2f} PLN).'
+                )
+        
+        return cleaned_data
+    
 # Form for creating/editing tasks
 class TaskForm(forms.ModelForm):
     class Meta:
@@ -288,6 +316,8 @@ class UserRegistrationForm(UserCreationForm):
             'class': 'form-control',
             'placeholder': 'Hasło'
         })
+        
+    
         self.fields['password2'].widget.attrs.update({
             'class': 'form-control',
             'placeholder': 'Potwierdź hasło'
@@ -300,3 +330,9 @@ class UserRegistrationForm(UserCreationForm):
         # Polish help texts
         self.fields['password1'].help_text = 'Hasło musi zawierać minimum 8 znaków i nie może być zbyt proste.'
         self.fields['password2'].help_text = 'Wprowadź to samo hasło ponownie.'
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError('Ten adres email jest już używany. Użyj innego adresu.')
+        return email
