@@ -1,167 +1,250 @@
-System Zarządzania Projektami
+# System Zarządzania Projektami
 
-Webowa aplikacja do zarządzania projektami, zadaniami i budżetem, stworzona z wykorzystaniem Django. System wspiera koordynację projektów finansowanych z dotacji/grantów z pełnym monitoringiem budżetu wieloletniego i zespołem projektowym.
+Aplikacja webowa do zarządzania projektami, zadaniami i budżetem, stworzona w Django. System wspiera koordynację projektów finansowanych z dotacji i grantów z pełnym monitoringiem budżetu wieloletniego.
 
-Cel projektu
+## Cel projektu
 
-Aplikacja umożliwia kompleksowe zarządzanie projektami z funkcjami:
-- Koordynacji wieloosobowych zespołów projektowych
-- Śledzenia postępu realizacji zadań
-- Zarządzania budżetem wieloletnim ze szczegółową kalkulacją kosztów
-- Monitorowania rezultatów i celów projektu
+Aplikacja umożliwia:
+- Koordynację wieloosobowych zespołów projektowych
+- Śledzenie postępu realizacji zadań
+- Zarządzanie budżetem wieloletnim ze szczegółową kalkulacją kosztów
+- Monitorowanie rezultatów i celów projektu
 
-Funkcjonalności
+## Funkcjonalności
 
-Zarządzanie projektami
+### Rejestracja i logowanie
+- Rejestracja nowych użytkowników z wyborem roli (koordynator/wykonawca)
+- Logowanie i wylogowanie
+- Walidacja unikalności adresu email
+- Automatyczne tworzenie profilu użytkownika
+
+### Zarządzanie projektami
 - Tworzenie, edycja i usuwanie projektów
-- Statusy: Rozpoczęty / W trakcie / Zakończony
-- Określanie terminów realizacji (data rozpoczęcia i zakończenia)
+- Statusy: Rozpoczęty, W trakcie, Zakończony
+- Terminy realizacji (data rozpoczęcia i zakończenia)
 - Przypisywanie koordynatora i członków zespołu
 - Automatyczne liczenie postępu realizacji
+- Walidacja dat (zakończenie musi być po rozpoczęciu)
 
-Zarządzanie zadaniami
+### Zarządzanie zadaniami
 - Pełny CRUD zadań w ramach projektów
 - Przypisywanie zadań do wielu osób
 - Priorytety (niski, średni, wysoki) i statusy
-- Terminy wykonania (deadlines)
+- Terminy wykonania
 - Śledzenie kosztów zadań
 
-Zarządzanie budżetem
-- **Źródła finansowania:**
-  - Dotacja
-  - Wkład własny finansowy
-  - Wkład własny niefinansowy
-  - Przychody od odbiorców
-- **Szczegółowa kalkulacja kosztów:**
-  - Kategorie: Koszty realizacji działań / Koszty administracyjne
+### Zarządzanie budżetem
+- Źródła finansowania: dotacja, wkład własny finansowy i niefinansowy, przychody od odbiorców
+- Szczegółowa kalkulacja kosztów z podziałem na:
+  - Kategorie (koszty realizacji działań, koszty administracyjne)
   - Jednostka miary, koszt jednostkowy, liczba jednostek
   - Podział na lata (wieloletnie planowanie budżetu)
-  - Automatyczne liczenie wartości całkowitej i sum
+- Automatyczne liczenie wartości całkowitej i sum
+- Walidacja budżetu (suma źródeł musi równać się budżetowi całkowitemu)
 
-Rezultaty projektu
+### Rezultaty projektu
 - Definiowanie celów i rezultatów projektu
 - Wartości docelowe (planowany poziom osiągnięcia)
 - Sposób monitorowania i źródła informacji
-- Statusy: Nie rozpoczęty / W trakcie / Osiągnięty
+- Statusy: Nie rozpoczęty, W trakcie, Osiągnięty
 
-System ról i uprawnień
-- **Koordynator:**
-  - Pełna kontrola nad swoimi projektami
-  - Tworzenie i edycja projektów, zadań, budżetu
-  - Zarządzanie zespołem
-- **Wykonawca:**
-  - Dostęp do przypisanych projektów
-  - Edycja własnych zadań
-  - Przeglądanie budżetu (tylko odczyt)
+### System ról i uprawnień
+- **Koordynator:** pełna kontrola nad swoimi projektami, tworzenie i edycja projektów, zadań, budżetu, zarządzanie zespołem
+- **Wykonawca:** dostęp do przypisanych projektów, edycja własnych zadań, przeglądanie budżetu (tylko odczyt)
 
-Dashboard
+### Dashboard
 - Statystyki: wszystkie projekty, zakończone, w trakcie
 - Liczba przypisanych zadań
 - Ostatnie projekty użytkownika
 - Paski postępu realizacji zadań i wykorzystania budżetu
 
-REST API
+## REST API
 
 Aplikacja udostępnia RESTful API dla wszystkich głównych modeli danych.
 
-Dostępne endpointy:
+### Dostępne endpointy:
 
-- **`GET /api/`** - Lista wszystkich dostępnych endpointów
-- **`GET/POST /api/projects/`** - Lista projektów / Tworzenie nowego projektu
-- **`GET/PUT/PATCH/DELETE /api/projects/{id}/`** - Szczegóły/edycja/usuwanie projektu
-- **`GET/POST /api/tasks/`** - Lista zadań / Tworzenie nowego zadania
-- **`GET/PUT/PATCH/DELETE /api/tasks/{id}/`** - Szczegóły/edycja/usuwanie zadania
-- **`GET/POST /api/budget-items/`** - Lista pozycji budżetowych
-- **`GET/PUT/PATCH/DELETE /api/budget-items/{id}/`** - Szczegóły/edycja/usuwanie pozycji
-- **`GET/POST /api/results/`** - Lista rezultatów
-- **`GET/PUT/PATCH/DELETE /api/results/{id}/`** - Szczegóły/edycja/usuwanie rezultatu
+- GET /api/ - lista wszystkich dostępnych endpointów
+- GET/POST /api/projects/ - lista projektów, tworzenie nowego projektu
+- GET/PUT/PATCH/DELETE /api/projects/{id}/ - szczegóły, edycja, usuwanie projektu
+- GET/POST /api/tasks/ - lista zadań, tworzenie nowego zadania
+- GET/PUT/PATCH/DELETE /api/tasks/{id}/ - szczegóły, edycja, usuwanie zadania
+- GET/POST /api/budget-items/ - lista pozycji budżetowych
+- GET/PUT/PATCH/DELETE /api/budget-items/{id}/ - szczegóły, edycja, usuwanie pozycji
+- GET/POST /api/results/ - lista rezultatów
+- GET/PUT/PATCH/DELETE /api/results/{id}/ - szczegóły, edycja, usuwanie rezultatu
 
-Autentykacja:
+### Autentykacja
 
-API wymaga uwierzytelnienia. Użyj sesji Django lub tokenu uwierzytelniającego.
+API wymaga uwierzytelnienia. Użyj sesji Django.
 
-Uprawnienia:
+### Uprawnienia
 
-- **Koordynatorzy:** Pełen dostęp do swoich projektów (CRUD)
-- **Wykonawcy:** Odczyt projektów, edycja przypisanych zadań
+- Koordynatorzy: pełen dostęp do swoich projektów (CRUD)
+- Wykonawcy: odczyt projektów, edycja przypisanych zadań
 - Użytkownicy widzą tylko dane z projektów, do których mają dostęp
 
-Technologie
+## Walidacja formularzy
 
-- **Backend:** Python 3.13, Django 6.0
-- **Frontend:** HTML5, CSS3, Bootstrap 5, Font Awesome
-- **Baza danych:** SQLite (development)
-- **API:** Django REST Framework
-- **Autentykacja:** Django Authentication System
-- **Narzędzia:** Git, VS Code
+Aplikacja zawiera walidację danych:
+- Unikalność adresu email przy rejestracji
+- Data zakończenia projektu musi być późniejsza niż data rozpoczęcia
+- Suma źródeł finansowania musi równać się budżetowi całkowitemu
+- Wyświetlanie czytelnych komunikatów błędów
 
-Modele danych
+## Docker
 
-- **User / UserProfile** - użytkownicy z rolami (koordynator/wykonawca)
-- **Project** - projekty z budżetem, terminami, zespołem
-- **Task** - zadania przypisane do projektów i osób
-- **BudgetItem** - szczegółowe pozycje budżetowe z podziałem na lata
-- **Result** - rezultaty/cele projektów z monitoringiem
+Aplikacja jest w pełni skonteneryzowana i gotowa do uruchomienia w Docker.
 
-Instalacja i uruchomienie
+### Struktura Docker:
+- Dockerfile - definicja obrazu aplikacji Django
+- docker-compose.yml - orkiestracja kontenerów (web + PostgreSQL)
+- Automatyczne migracje przy starcie kontenera
+- Volume dla PostgreSQL - trwałe przechowywanie danych
+- Health checks - sprawdzanie gotowości bazy danych
 
-Wymagania
-- Python 3.8+
-- pip
+### Komendy Docker:
 
-Kroki instalacji
-
-1. **Sklonuj repozytorium:**
+Budowanie i uruchomienie:
 ```bash
-git clone <url-repozytorium>
+docker-compose up --build
+```
+
+Uruchomienie w tle:
+```bash
+docker-compose up -d
+```
+
+Sprawdzenie logów:
+```bash
+docker-compose logs -f web
+```
+
+Zatrzymanie:
+```bash
+docker-compose down
+```
+
+Usunięcie z danymi:
+```bash
+docker-compose down -v
+```
+
+## Technologie
+
+- Backend: Python 3.13, Django 6.0
+- Frontend: HTML5, CSS3, Bootstrap 5, Font Awesome
+- Baza danych: SQLite (lokalne uruchomienie), PostgreSQL (Docker)
+- API: Django REST Framework
+- Autentykacja: Django Authentication System
+- Konteneryzacja: Docker, Docker Compose
+- Narzędzia: Git, VS Code
+
+## Modele danych
+
+- User / UserProfile - użytkownicy z rolami (koordynator/wykonawca)
+- Project - projekty z budżetem, terminami, zespołem
+- Task - zadania przypisane do projektów i osób
+- BudgetItem - szczegółowe pozycje budżetowe z podziałem na lata
+- Result - rezultaty i cele projektów z monitoringiem
+
+## Instalacja i uruchomienie
+
+### Metoda 1: Docker (zalecana)
+
+#### Wymagania
+- Docker
+- Docker Compose
+
+#### Kroki:
+
+1. Sklonuj repozytorium:
+```bash
+git clone https://github.com/ewabuzon5-ux/Final_project.git
 cd Final_project
 ```
 
-2. **Stwórz wirtualne środowisko:**
+2. Uruchom aplikację:
+```bash
+docker-compose up --build
+```
+
+3. Stwórz superużytkownika (w nowym terminalu):
+```bash
+docker-compose exec web python manage.py createsuperuser
+```
+
+4. Otwórz przeglądarkę:
+```
+http://localhost:8000/
+```
+
+5. Zatrzymanie:
+```bash
+docker-compose down
+```
+
+Uwaga: Dane w PostgreSQL są przechowywane w volume postgres_data i pozostają nawet po zatrzymaniu kontenerów.
+
+### Metoda 2: Lokalne uruchomienie (bez Dockera)
+
+#### Wymagania
+- Python 3.8 lub nowszy
+- pip
+
+#### Kroki:
+
+1. Sklonuj repozytorium:
+```bash
+git clone https://github.com/ewabuzon5-ux/Final_project.git
+cd Final_project
+```
+
+2. Stwórz wirtualne środowisko:
 ```bash
 python -m venv venv
 ```
 
-3. **Aktywuj środowisko:**
-- Windows (Git Bash): `source venv/Scripts/activate`
-- Linux/Mac: `source venv/bin/activate`
+3. Aktywuj środowisko:
+- Windows (Git Bash): source venv/Scripts/activate
+- Linux/Mac: source venv/bin/activate
 
-4. **Zainstaluj zależności:**
+4. Zainstaluj zależności:
 ```bash
-pip install django djangorestframework psycopg2-binary
+pip install -r requirements.txt
 ```
 
-5. **Wykonaj migracje:**
+5. Wykonaj migracje:
 ```bash
 python manage.py migrate
 ```
 
-6. **Stwórz superużytkownika:**
+6. Stwórz superużytkownika:
 ```bash
 python manage.py createsuperuser
 ```
 
-7. **Uruchom serwer:**
+7. Uruchom serwer:
 ```bash
 python manage.py runserver
 ```
 
-8. **Otwórz przeglądarkę:**
+8. Otwórz przeglądarkę:
 ```
 http://127.0.0.1:8000/
 ```
 
-## 👤 Autor
+## Autor
 
 Projekt stworzony jako praca końcowa na kurs Python/Django.
 
-**Ewa** - System Zarządzania Projektami
+Ewa - System Zarządzania Projektami
 
-## 📝 Licencja
+## Licencja
 
-Projekt edukacyjny.
+Projekt edukacyjny - wykorzystanie do celów nauki i rozwoju.
 
 ---
 
-**Status projektu:** ✅ Ukończony  
-**Data:** Marzec 2026
+Status projektu: Ukończony
+Data: Marzec 2026
